@@ -1,0 +1,10 @@
+apt-get install python-pip
+pip install -U pip
+pip install -U virtualenvwrapper
+mkdir ~/.virtualenvs
+### dans bashrc ###
+export WORKON_HOME="$HOME/.virtualenvs"
+source /usr/local/bin/virtualenvwrapper.sh
+###################
+mkvirtualenv --distribute django1.7
+pip install django
