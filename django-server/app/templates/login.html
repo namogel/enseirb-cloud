@@ -1,0 +1,60 @@
+{% extends "cloud_base.html" %}
+
+{% block body %}
+{{ block.super }}
+
+
+<div>
+    <h2>Connexion</h2>
+    <form method="post" action="/accounts/login">
+        {% csrf_token %}
+        {% if wrong_login %}
+        <p style="color:red">Couple identifiant / mot de passe invalide, veuillez essayer à nouveau.</p>
+        {% endif %}
+        {% if wrong_username %}
+        <p style="color:red">Identifiant inconnu.</p>
+        {% endif %}
+        <table>
+        <tr>
+            <td>Identifiant</td>
+            <td><input type="text" value="{{ form_login.username }}" name="username"></td>
+        </tr>
+        <tr>
+            <td>Mot de passe</td>
+            <td><input type="password" value="{{ form_login.password }}" name="password"></td>
+        </tr>
+        </table>
+        
+        <input class="btn btn-primary" type="submit" value="Connexion" />
+        <input type="hidden" name="next" value="{{ next }}" />
+        <input type="hidden" name="action" value="login" />
+    </form>
+</div>
+
+
+<div>
+    <h2>Créer un compte</h2>    
+    <form method="post" action="/accounts/login">
+        {% csrf_token %}
+        {% if username_busy %}
+        <p style="color:red">Identifiant déjà choisi, merci d'en choisir un nouveau.</p>
+        {% endif %}
+        <table>
+        <tr>
+            <td>Identifiant</td>
+            <td><input type="text" value="{{ form_create.username }}" name="username"></td>
+        </tr>
+        <tr>
+            <td>Mot de passe</td>
+            <td><input type="password" value="{{ form_create.password }}" name="password"></td>
+        </tr>
+        </table>
+        
+        <input class="btn btn-primary" type="submit" value="Créer un compte" />
+        <input type="hidden" name="next" value="{{ next }}" />
+        <input type="hidden" name="action" value="create" />
+    </form>
+
+</div>
+
+{% endblock %}
