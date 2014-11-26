@@ -27,7 +27,7 @@
         
         <input class="btn btn-primary" type="submit" value="Connexion" />
         <input type="hidden" name="next" value="{{ next }}" />
-        <input type="hidden" name="action" value="login" />
+        <input type="hidden" name="action" value="connect" />
     </form>
 </div>
 
@@ -39,6 +39,12 @@
         {% if username_busy %}
         <p style="color:red">Identifiant déjà choisi, merci d'en choisir un nouveau.</p>
         {% endif %}
+        {% if invalid_mail %}
+        <p style="color:red">Adresse mail invalide, merci d'en saisir une valide.</p>
+        {% endif %}
+        {% if mail_busy %}
+        <p style="color:red">Un compte est déjà lié à cette adresse email.</p>
+        {% endif %}
         <table>
         <tr>
             <td>Identifiant</td>
@@ -47,6 +53,10 @@
         <tr>
             <td>Mot de passe</td>
             <td><input type="password" value="{{ form_create.password }}" name="password"></td>
+        </tr>
+        <tr>
+            <td>Adresse mail</td>
+            <td><input type="text" value="{{ form_create.mail }}" name="mail"></td>
         </tr>
         </table>
         

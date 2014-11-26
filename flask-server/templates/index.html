@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>enseirb cloud</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+
+<body>
+
+<div>
+<h1>Liste des utilisateurs</h1>
+<table>
+    <tr>
+        <td>username</td>
+        <td>password</td>
+        <td>mail</td>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.password }}</td>
+        <td>{{ user.mail }}</td>
+        <td>
+            <form action="/delete_user" method="post">
+                <input type="hidden" name="id" value="{{ user.id }}">
+                <input class="btn" type="submit" value="X">
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<br/>
+<form method="post" action="/search_user">
+    <table>
+        <tr>
+            <td>Identifiant</td>
+            <td><input type="text" name="username"></td>
+        </tr>
+        <tr>
+            <td>Adresse mail</td>
+            <td><input type="text" name="mail"></td>
+        </tr>
+    </table>
+    <input class="btn" type="submit" value="filtrer">
+</form>
+</div>
+
+<div>
+<h1>Ajouter un utilisateur</h1>
+<form action="/add_user" method="post">
+    <table>
+        <tr>
+            <td>Identifiant</td>
+            <td><input type="text" name="username"></td>
+        </tr>
+        <tr>
+            <td>Mot de passe</td>
+            <td><input type="password" name="password"></td>
+        </tr>
+        <tr>
+            <td>Adresse mail</td>
+            <td><input type="text" name="mail"></td>
+        </tr>
+    </table>
+    <input class="btn" type="submit" value="Ajouter un utilisateur" />
+</form>
+
+</body>
+</html>
+
