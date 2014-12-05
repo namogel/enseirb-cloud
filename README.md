@@ -33,16 +33,29 @@ Installation
 
 **Flask**
 
+	workon django1.7
 
+	python install https://github.com/mitsuhiko/flask/tarball/master
+
+In the folder flask-server/ do :
+
+	sqlite3 database < schema.sql
+
+	python
+
+	from server import init_db
+
+	init_db()
 
 - - -
 
 Usage
 -----
 
-	mkvirtualenv --distribute django1.7
+	workon django1.7
 
 	python django-server/manage.py runserver
+
 
 
 - - - 
