@@ -19,12 +19,6 @@ def connect_db():
     rv.row_factory = sqlite3.Row
     return rv
 
-# def query_db(query, args=(), one=False):
-#     cur = get_db().execute(query, args)
-#     rv = cur.fetchall()
-#     cur.close()
-#     return (rv[0] if rv else None) if one else rv
-
 def init_db():
     with app.app_context():
         db = get_db()
@@ -83,7 +77,8 @@ def search_user():
 def get_db_users(username, mail):
     db = get_db()
     if username != '' or mail != '':
-        cur = db.execute('select * from users where username = ? or mail = ?', [username, mail])
+        cur = db.execute('select * from users where username = ? or mail = ?',
+            [username, mail])
     else:
         cur = db.execute('select * from users')
     users = cur.fetchall()
@@ -110,10 +105,10 @@ def is_request_valid(type, form):
 def login():
     if not is_request_valid('login', request.form):
         return "invalid protocol"
-    
+
     username = request.form['username']
     password = request.form['password']
-    
+
     if request.form['option'] == 'connect':
         user = get_db_users(username, '')
         if user == []:
@@ -132,6 +127,30 @@ def login():
             return 'mail_busy'
         add_db_user(username, password, mail)
         return 'ok'
+
+@app.route('/login/data', methods=['GET'])
+def login_data():
+    try:
+        mode = request.args['mode']
+        if mode == 'single':
+            data = request.args['data']
+        elif mode == 'all':
+            data = '*'
+        else:
+            raise KeyError
+        field = request.args['field']
+        value = request.args['value']
+    except KeyError:
+        abort(404)
+
+    db = get_db()
+    cur = db.execute('select {} from users where {} = ?'.format(data, field), [value])
+    user = cur.fetchall()
+    if user == []:
+        return "err"
+    if mode == 'single':
+        return "{}".format(user[0][0])
+    return "id={}&username={}&mail={}".format(user[0][0], user[0][1], user[0][3])
 
 
 if __name__ == '__main__':

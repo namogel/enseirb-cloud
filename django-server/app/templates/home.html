@@ -3,7 +3,27 @@
 {% block header %}
 {{ block.super }}
 <div><a href="/accounts/logout">Déconnexion</a></div>
-<h2>Accueil</h2>
+<div>
+    <h1>Liste des fichiers</h1>
+    <table>
+        {% for file in files %}
+        <tr>
+            <td>{{ file.name }}</td>
+            <td>{{ file.ftype }}</td>
+        </tr>
+        {% empty %}
+        <p>Vous n'avez pas encore uploadé de fichier</p>
+        {% endfor %}
+    </table>
+</div>
+<div>
+    <h1>Upload un fichier</h1>
+    <form action='/file/upload' method='POST' enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Uploader ce fichier" />
+    </form>
+</div>
 
 
 {% endblock %}
