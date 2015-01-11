@@ -1,0 +1,20 @@
+
+[draggable] {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+ 
+#table tr {
+    margin:4px;
+    width:75px;
+    border: 1px solid #000;
+    border-radius:2px;
+    cursor: move;
+    text-align:center;
+    padding:2px;
+    box-shadow: 1px 1px 12px #555;
+    background-color:white;
+    list-style-type:none;
+}

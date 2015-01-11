@@ -5,9 +5,9 @@
 <div><a href="/accounts/logout">Déconnexion</a></div>
 <div>
     <h1>Liste des fichiers</h1>
-    <table>
+    <table id="table">
         {% for file in files %}
-        <tr>
+        <tr draggable="true">
             <td>{{ file.name }}</td>
             <td>{{ file.ftype }}</td>
         </tr>

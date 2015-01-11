@@ -152,6 +152,10 @@ def login_data():
         return "{}".format(user[0][0])
     return "id={}&username={}&mail={}".format(user[0][0], user[0][1], user[0][3])
 
+@app.route('/tree', methods=['GET'])
+def update_tree():
+    print 'tree updated'
+    return "ok"
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 8080)
