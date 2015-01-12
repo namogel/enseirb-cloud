@@ -87,3 +87,4 @@ target/
 # my rules
 *db.sqlite3
 *database.db
+*database
