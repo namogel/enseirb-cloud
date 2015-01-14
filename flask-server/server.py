@@ -154,8 +154,26 @@ def login_data():
 
 @app.route('/tree', methods=['GET'])
 def update_tree():
-    print 'tree updated'
-    return "ok"
+    try:
+        mode = request.args['mode']
+        dragged_id = request.args.get('field[dragged_file_id]')
+        dropped_id = request.args.get('field[dropped_file_id]')
+        # print field
+        if mode == 'in':
+            # DEBUG 
+            print 'Putting '+dragged_id+' inside folder ' +dropped_id  
+            print "tree updated"
+            return "ok"
+        elif mode == 'swap':
+            # DEBUG 
+            print 'Swapping '+dragged_id+' and ' +dropped_id  
+            print "tree updated"
+            return "ok"
+        else:
+            raise KeyError
+    except KeyError:
+        abort(404)
+    return "err"
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 8080)

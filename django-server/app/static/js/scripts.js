@@ -1,14 +1,3 @@
-// function handleDragStart(e) {
-//     this.style.opacity = '0.4';
-// }
-
-// var trs = document.querySelectorAll('#table tr');
-// [].forEach.call(trs, function(tr) {
-//     tr.addEventListener('dragstart', handleDragStart, false);
-// });
-
-
-
 // ajoute la propriété pour le drop et le transfert de données
 $.event.props.push('dataTransfer');
  
@@ -27,7 +16,9 @@ $(document).ready(function() {
             
 
             // on garde l'id en mémoire 
-            e.dataTransfer.setData('id', $this.id());
+            //e.dataTransfer.setData('id', $this.id());
+            // DEBUG
+            e.dataTransfer.setData('id', '333');
         },
 
         // on passe sur un élément draggable
@@ -61,7 +52,9 @@ $(document).ready(function() {
                     'mode': 'swap', // DEBUG
                     'field': {
                         'dragged_file_id' : e.dataTransfer.getData('id'),
-                        'dropped_file_id' : $(this).id(),    
+                        // DEBUG
+                        //'dropped_file_id' : $(this).id(),
+                        'dropped_file_id' : '666',
                     },
                 }
                 $.get('http://localhost:8080/tree', data_get);
