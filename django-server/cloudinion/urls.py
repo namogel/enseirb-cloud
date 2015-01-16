@@ -8,5 +8,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/login/?$', views.login_user),
     url(r'^accounts/logout$', views.logout_user),
+    # url(r'^accounts/islogged$', views.is_logged),
     url(r'^file/upload$', views.upload_file),
 )

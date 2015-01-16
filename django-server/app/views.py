@@ -13,9 +13,6 @@ import datetime
 
 SERVER_BASE_URL = 'http://localhost:8080/'
 
-def index(request):
-    return HttpResponse("hi there")
-
 
 @render_to('login.html')
 def login_user(request):
@@ -34,12 +31,11 @@ def login_user(request):
             username = request.POST['username']
             password = request.POST['password']
             data = {
-                'option': action,
                 'username': username,
                 'password': password,
                 'mail': request.POST.get('mail', None),
             }
-            login_req = requests.post(SERVER_BASE_URL + 'login', data=data)
+            login_req = requests.post(SERVER_BASE_URL + 'login/' + action, data=data)
             login_status = login_req.text
 
             if action == 'connect':
@@ -87,12 +83,15 @@ def login_user(request):
                         context['mail_busy'] = True
                     context['form_create'] = request.POST
 
+        except requests.exceptions.ConnectionError:
+            return render_to_response('down.html')
         except KeyError:
-            return HttpResponseBadRequest
+            return HttpResponseBadRequest()
 
     return context
 
 
+@login_required
 def logout_user(request):
     logout(request)
     return redirect(reverse('app.views.login_user'))
@@ -101,11 +100,16 @@ def logout_user(request):
 @login_required
 @render_to('home.html')
 def home(request):
-    files = [
-        File(name="fichier_1", ftype="txt", updated_date=datetime.datetime.now()),
-        File(name="fichier_2", ftype="mp3", updated_date=datetime.datetime.now()),
-        File(name="fichier_3", ftype="avi", updated_date=datetime.datetime.now()),
-    ]
+    try:
+        login_req = requests.get(SERVER_BASE_URL + 'tree/show', 
+            params={'id_usr': request.user.id, 'id_file': 0})
+        names, types, ids = [e.split("=")[1].split(",")[:-1] \
+            for e in login_req.text.split('&')]
+    except requests.exceptions.ConnectionError:
+        return render_to_response('down.html')
+
+    files = [File(name=name, ftype=type, id=id) for name, type, id in \
+        zip(names, types, ids)]
     form = UploadFileForm()
     return {'files': files, 'form': form}
 
@@ -116,24 +120,19 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             up_file = request.FILES['file']
-            print up_file.name, up_file.content_type, up_file.size
-            
-            username = request.POST['username']
-            password = request.POST['password']
             data = {
-                'option': 'upload',
-                'username': username,
-                'password': password,
-                'mail': request.POST.get('mail', None),
+                'id_usr': request.user.id,
+                'name': up_file.name,
+                'type': up_file.content_type,
+                'size': up_file.size,
             }
-            login_req = requests.post(SERVER_BASE_URL + 'data', data=data)
+            try:
+                login_req = requests.post(SERVER_BASE_URL + 'file/upload', data=data)
+            except requests.exceptions.ConnectionError:
+                return render_to_response('down.html')
             login_status = login_req.text
             print login_status
-
-
-
-
-            return redirect(reverse('app.views.home'))
+        return redirect(reverse('app.views.home'))
     else:
         return HttpResponseBadRequest
 

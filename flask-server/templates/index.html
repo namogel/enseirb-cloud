@@ -7,63 +7,140 @@
 
 <body>
 
-<div>
-<h1>Liste des utilisateurs</h1>
 <table>
-    <tr>
-        <td>username</td>
-        <td>password</td>
-        <td>mail</td>
-    </tr>
-    {% for user in users %}
-    <tr>
-        <td>{{ user.username }}</td>
-        <td>{{ user.password }}</td>
-        <td>{{ user.mail }}</td>
-        <td>
-            <form action="/delete_user" method="post">
-                <input type="hidden" name="id" value="{{ user.id }}">
-                <input class="btn" type="submit" value="X">
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
+<tr>
+<td>
+    <div>
+    <h1>Liste des utilisateurs</h1>
+    <table>
+        <tr>
+            <td>username</td>
+            <td>password</td>
+            <td>mail</td>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+            <td>{{ user.mail }}</td>
+            <td>
+                <form action="/delete_user" method="post">
+                    <input type="hidden" name="id" value="{{ user.id }}">
+                    <input class="btn" type="submit" value="X">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <form method="post" action="/search_user">
+        <table>
+            <tr>
+                <td>Identifiant</td>
+                <td><input type="text" name="username"></td>
+            </tr>
+            <tr>
+                <td>Adresse mail</td>
+                <td><input type="text" name="mail"></td>
+            </tr>
+        </table>
+        <input class="btn" type="submit" value="filtrer">
+    </form>
+    </div>
+</td>
+<td>
+    <div>
+    <h1>Liste des fichiers</h1>
+    <table>
+        <tr>
+            <td>name</td>
+            <td>type</td>
+        </tr>
+        {% for file in files %}
+        <tr>
+            <td>{{ file.name }}</td>
+            <td>{{ file.type }}</td>
+            <td>
+                <form action="/delete_file" method="post">
+                    <input type="hidden" name="id" value="{{ file.id }}">
+                    <input class="btn" type="submit" value="X">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <form method="post" action="/search_file">
+        <table>
+            <tr>
+                <td>name</td>
+                <td><input type="text" name="name"></td>
+            </tr>
+            <tr>
+                <td>type</td>
+                <td>
+                    <select name="type">
+                        <option value="audio">audio</option>
+                        <option value="video">video</option>
+                        <option value="file">fichier</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <input class="btn" type="submit" value="filtrer">
+    </form>
+    </div>
+</td>
+</tr>
+<tr>
+<td>
+    <div>
+    <h1>Ajouter un utilisateur</h1>
+    <form action="/add_user" method="post">
+        <table>
+            <tr>
+                <td>Identifiant</td>
+                <td><input type="text" name="username"></td>
+            </tr>
+            <tr>
+                <td>Mot de passe</td>
+                <td><input type="password" name="password"></td>
+            </tr>
+            <tr>
+                <td>Adresse mail</td>
+                <td><input type="text" name="mail"></td>
+            </tr>
+        </table>
+        <input class="btn" type="submit" value="Ajouter un utilisateur" />
+    </form>
+    </div>
+</td>
+<td>
+    <div>
+    <h1>Ajouter un fichier</h1>
+    <form action="/add_file" method="post">
+        <table>
+            <tr>
+                <td>Nom</td>
+                <td><input type="text" name="name"></td>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td>
+                    <select name="type">
+                        <option value="audio">audio</option>
+                        <option value="video">video</option>
+                        <option value="file">fichier</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <input class="btn" type="submit" value="Ajouter un fichier" />
+    </form>
+    </div>
+</td>
+</tr>
 </table>
-<br/>
-<form method="post" action="/search_user">
-    <table>
-        <tr>
-            <td>Identifiant</td>
-            <td><input type="text" name="username"></td>
-        </tr>
-        <tr>
-            <td>Adresse mail</td>
-            <td><input type="text" name="mail"></td>
-        </tr>
-    </table>
-    <input class="btn" type="submit" value="filtrer">
-</form>
-</div>
-
-<div>
-<h1>Ajouter un utilisateur</h1>
-<form action="/add_user" method="post">
-    <table>
-        <tr>
-            <td>Identifiant</td>
-            <td><input type="text" name="username"></td>
-        </tr>
-        <tr>
-            <td>Mot de passe</td>
-            <td><input type="password" name="password"></td>
-        </tr>
-        <tr>
-            <td>Adresse mail</td>
-            <td><input type="text" name="mail"></td>
-        </tr>
-    </table>
-    <input class="btn" type="submit" value="Ajouter un utilisateur" />
-</form>
 
 </body>
 </html>

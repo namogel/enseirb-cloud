@@ -1,9 +1,13 @@
 {% extends "cloud_base.html" %}
 
+
+{% block header %}
+<div><h1>Un cloud au design de votre souhait</h1></div>
+{% endblock %}
+
+
 {% block body %}
 {{ block.super }}
-
-
 <div>
     <h2>Connexion</h2>
     <form method="post" action="/accounts/login">
@@ -30,7 +34,6 @@
         <input type="hidden" name="action" value="connect" />
     </form>
 </div>
-
 
 <div>
     <h2>Créer un compte</h2>    
@@ -66,5 +69,4 @@
     </form>
 
 </div>
-
 {% endblock %}
