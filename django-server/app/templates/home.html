@@ -5,9 +5,9 @@
 {{ block.super }}
 <div>
     <h1>Liste des fichiers</h1>
-    <table>
+    <table id="table">
         {% for file in files %}
-        <tr "id"={{file.id}}>
+        <tr draggable="true" "id"={{file.id}}>
             <td>{{ file.name }}</td>
             <td>{{ file.ftype }}</td>
         </tr>

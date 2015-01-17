@@ -182,6 +182,28 @@ def login_data():
         return "{}".format(user[0][0])
     return "id={}&username={}&mail={}".format(user[0][0], user[0][1], user[0][3])
 
+@app.route('/tree', methods=['GET'])
+def update_tree():
+    try:
+        mode = request.args['mode']
+        dragged_id = request.args.get('field[dragged_file_id]')
+        dropped_id = request.args.get('field[dropped_file_id]')
+        # print field
+        if mode == 'in':
+            # DEBUG 
+            print 'Putting '+dragged_id+' inside folder ' +dropped_id  
+            print "tree updated"
+            return "ok"
+        elif mode == 'swap':
+            # DEBUG 
+            print 'Swapping '+dragged_id+' and ' +dropped_id  
+            print "tree updated"
+            return "ok"
+        else:
+            raise KeyError
+    except KeyError:
+        abort(404)
+    return "err"
 
 @app.route('/file/upload', methods=['POST'])
 def upload_file():
