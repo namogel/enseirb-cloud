@@ -236,9 +236,6 @@ def show_tree():
     except KeyError:
         return "err"
 
-@app.route('/tree', methods=['GET'])
-def update_tree():
-    print 'tree updated'
 
 
 if __name__ == '__main__':
