@@ -54,7 +54,7 @@ def login_user(request):
                         usr.save()
                     user = authenticate(username=username, password=password)
                     login(request, user)
-                    return redirect(reverse('app.views.home'))
+                    return redirect(reverse('app.views.home'), 0)
                 elif login_status == 'invalid_username':
                     context['wrong_username'] = True
                 elif login_status == 'invalid_password':
@@ -73,7 +73,7 @@ def login_user(request):
                     usr.save()
                     user = authenticate(username=username, password=password)
                     login(request, user)
-                    return redirect(reverse('app.views.home'))
+                    return redirect(reverse('app.views.home'), 0)
                 else:
                     if login_status == 'username_busy':
                         context['username_busy'] = True
@@ -100,24 +100,27 @@ def logout_user(request):
 @login_required
 @render_to('home.html')
 def home(request):
+    location = request.GET.get('location', 0)
     try:
-        login_req = requests.get(SERVER_BASE_URL + 'tree/show', 
-            params={'id_usr': request.user.id, 'id_file': 0})
-        names, types, ids = [e.split("=")[1].split(",")[:-1] \
+        login_req = requests.get(SERVER_BASE_URL + 'tree/show', \
+            params={'id_usr': request.user.id, 'location': location})
+        names, types, ids, parent = [e.split("=")[1] \
             for e in login_req.text.split('&')]
+        names, types, ids = [e.split(",")[:-1] for e in [names, types, ids]]
     except requests.exceptions.ConnectionError:
         return render_to_response('down.html')
 
     files = [File(name=name, ftype=type, id=id) for name, type, id in \
         zip(names, types, ids)]
     form = UploadFileForm()
-    return {'files': files, 'form': form}
+    return {'files': files, 'form': form, 'location': location, 'parent': parent}
 
 
 @login_required
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
+        location = request.POST['location']
         if form.is_valid():
             up_file = request.FILES['file']
             data = {
@@ -125,14 +128,40 @@ def upload_file(request):
                 'name': up_file.name,
                 'type': up_file.content_type,
                 'size': up_file.size,
+                'location': location,
             }
             try:
                 login_req = requests.post(SERVER_BASE_URL + 'file/upload', data=data)
             except requests.exceptions.ConnectionError:
                 return render_to_response('down.html')
             login_status = login_req.text
-            print login_status
-        return redirect(reverse('app.views.home'))
+        return redirect('/home?location=' + location)
     else:
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
+@login_required
+def delete_file(request):
+    if request.method == 'POST':
+        data = {
+            'id_file': request.POST['id'],
+            'id_usr': request.user.id,
+            }
+        requests.post(SERVER_BASE_URL + 'file/delete', data=data)
+        return redirect('/home?location=' + request.POST['location'])
+    else:
+        return HttpResponseBadRequest()
+
+
+@login_required
+def new_folder(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        location = request.POST['location']
+        try:
+            requests.post(SERVER_BASE_URL + 'tree/update/new', data={ \
+                'id_usr': request.user.id, 'location': location, 'name': name})
+            return redirect('/home?location=' + location)
+        except requests.exceptions.ConnectionError:
+            return render_to_response('down.html')
+    else:
+        return HttpResponseBadRequest()

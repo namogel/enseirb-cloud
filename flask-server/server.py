@@ -73,7 +73,7 @@ def delete_user():
 @app.route('/search_user', methods=['POST'])
 def search_user():
     users = get_db_users(request.form['username'], request.form['mail'])
-    files = get_db_files()
+    files = get_db_files(users[0][0])
     return render_template('index.html', users=users, files=files)
 
 def get_db_users(username='', mail=''):
@@ -88,39 +88,41 @@ def get_db_users(username='', mail=''):
 #------------------------------------------------------------------------------#
 
 #------------------------------------------------------------------------------#
-def add_db_file(id_usr, name, type):
+def add_db_file(id_usr, name, type, folder):
     db = get_db()
-    db.execute('insert into files (id_usr, name, type) values (?, ?, ?)',
-               [id_usr, name, type])
+    db.execute('insert into files (id_usr, name, type, folder) \
+        values (?, ?, ?, ?)', [id_usr, name, type, folder])
     db.commit()
-    flash('New entry was successfully posted')
 
-@app.route('/add_file', methods=['POST'])
-def add_file():
-    add_db_file(request.form['id_usr'], request.form['name'], request.form['type'])
-    return redirect(url_for('home'))
-
-@app.route('/delete_file', methods=['POST'])
-def delete_file():
+def del_db_file(id_usr, id):
     db = get_db()
-    db.execute('delete from files where id = ?', [request.form['id']])
+    db.execute('delete from files where id_usr = ? and id = ?', \
+        [id_usr, id])
     db.commit()
-    return redirect(url_for('home'))
 
 @app.route('/search_file', methods=['POST'])
 def search_file():
     users = get_db_users()
-    files = get_db_files(request.form['id_usr'], request.form['name'], 
-        request.form['type'])
+    files = get_db_files(request.form['id_usr'], name=request.form['name'])
     return render_template('index.html', users=users, files=files)
 
-def get_db_files(id_usr, name='', type=''):
+def get_db_files(id_usr, id=None, folder=-1, name=''):
     db = get_db()
-    if name:
-        cur = db.execute('select * from files where id_usr = ? and name like ?',
-            [id_usr, '%{}%'.format(name)])
+    if id:
+        cur = db.execute('select * from files where id_usr = ? and id = ?', \
+            [id_usr, id])
     else:
-        cur = db.execute('select * from files where id_usr = ?', [id_usr])
+        if name and folder != -1:
+            cur = db.execute('select * from files where id_usr = ? and folder = ? \
+                and name like ?', [id_usr, folder, '%{}%'.format(name)])
+        elif folder != -1:
+            cur = db.execute('select * from files where id_usr = ? and folder = ?',\
+                [id_usr, folder])
+        elif name:
+            cur = db.execute('select * from files where id_usr = ? \
+                and name like ?', [id_usr, '%{}%'.format(name)])
+        else:
+            cur = db.execute('select * from files where id_usr = ?', [id_usr])
     files = cur.fetchall()
     return files
 #------------------------------------------------------------------------------#
@@ -174,7 +176,8 @@ def login_data():
         abort(404)
 
     db = get_db()
-    cur = db.execute('select {} from users where {} = ?'.format(data, field), [value])
+    cur = db.execute('select {} from users where {} = ?'.format(data, field), \
+        [value])
     user = cur.fetchall()
     if user == []:
         return "err"
@@ -205,34 +208,62 @@ def update_tree():
         abort(404)
     return "err"
 
+@app.route('/tree/update/new', methods=['POST'])
+def new_folder():
+    try:
+        id_usr = request.form['id_usr']
+        name = request.form['name']
+        location = request.form['location']
+        folder = get_db_files(id_usr, name=name, folder=location)
+        if folder:
+            raise KeyError
+        add_db_file(id_usr, name, "folder", location)
+        return "ok"
+    except KeyError:
+        return "err"
+    
 @app.route('/file/upload', methods=['POST'])
 def upload_file():
     try:
         id_usr = request.form['id_usr']
         name = request.form['name']
-        type = request.form['type']
-        size = request.form['size']
-        file = get_db_files(id_usr, name, type)
-        if file:
+        type_ = request.form['type']
+        location = request.form['location']
+        file_ = get_db_files(id_usr, name=name)
+        if file_:
             raise KeyError
     except KeyError:
         return "err"
-    add_db_file(id_usr, name, type)
+    add_db_file(id_usr, name, type_, location)
     return "ok"
 
+@app.route('/file/delete', methods=['POST'])
+def remove_file():
+    try:
+        id_usr = request.form['id_usr']
+        id_file = request.form['id_file']
+        file_ = get_db_files(id_usr, id=id_file)
+        if not file_:
+            raise KeyError
+        del_db_file(id_usr, id_file)
+    except KeyError:
+        return "err"
+    return "ok"
 
 @app.route('/tree/show', methods=['GET'])
 def show_tree():
     try:
         id_usr = request.args['id_usr']
-        id_file = request.args['id_file']
-        files = get_db_files(id_usr)
+        location = request.args['location']
+        parent = get_db_files(id_usr, id=location)[0][4] if location != '0' else -1
+        files = get_db_files(id_usr, folder=location)
         ids, names, types = "", "", ""
         for file in files:
             ids += str(file[0]) + ","
             names += file[2] + ","
             types += file[3] + ","
-        return "names=" + names + "&types=" + types + "&ids=" + ids
+        return "names=" + names + "&types=" + types + "&ids=" + ids + \
+            "&parent=" + str(parent)
     except KeyError:
         return "err"
 

@@ -6,16 +6,35 @@
 <div>
     <h1>Liste des fichiers</h1>
     <table id="table">
+        {% if parent != '-1' %}
+        <tr>
+            <td><a href="http://localhost:8000/home?location={{parent}}">
+                ../ </a></td>
+        </tr>
+        {% endif %}
         {% for file in files %}
         <tr draggable="true" "id"={{file.id}}>
+        {% if file.ftype == "folder" %}
+            <td><a href="http://localhost:8000/home?location={{file.id}}">
+                {{ file.name }}</a></td>
+        {% else %}
             <td>{{ file.name }}</td>
-            <td>{{ file.ftype }}</td>
+        {% endif %}
+            <td>
+                <form action="/file/delete" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ file.id }}">
+                    <input type="hidden" name="location" value="{{ location }}">
+                    <input class="btn" type="submit" value="X">
+                </form>
+            </td>
         </tr>
-        {% empty %}
-        <p>Vous n'avez pas encore uploadé de fichier</p>
         {% endfor %}
     </table>
     <form action='/tree/new' method="POST">
+        {% csrf_token %}
+        <input type="text", name="name"/>
+        <input type="hidden" name="location" value="{{location}}" />
         <input type="submit" value="Ajouter un dossier">
     </form>
 </div>
@@ -24,6 +43,7 @@
     <form action='/file/upload' method='POST' enctype="multipart/form-data">
         {% csrf_token %}
         {{ form }}
+        <input type="hidden" name="location" value="{{location}}" />
         <input type="submit" value="Uploader ce fichier" />
     </form>
 </div>
