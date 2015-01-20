@@ -59,6 +59,7 @@
             <td>type</td>
             <td>id</td>
             <td>id_usr</td>
+            <td>location</td>
         </tr>
         {% for file in files %}
         <tr>
@@ -66,6 +67,7 @@
             <td>{{ file.type }}</td>
             <td>{{ file.id }}</td>
             <td>{{ file.id_usr }}</td>
+            <td>{{ file.folder }}</td>
             <td>
                 <form action="/delete_file" method="post">
                     <input type="hidden" name="id" value="{{ file.id }}">

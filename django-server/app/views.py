@@ -5,6 +5,7 @@ from annoying.decorators import render_to
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from models import File
 from forms import UploadFileForm
 import requests
@@ -164,4 +165,20 @@ def new_folder(request):
         except requests.exceptions.ConnectionError:
             return render_to_response('down.html')
     else:
+        return HttpResponseBadRequest()
+
+@csrf_exempt
+@login_required
+def move_file(request):
+    if request.method == 'POST':
+        dragged = request.POST['field[dragged_file_id]']
+        dropped = request.POST['field[dropped_file_id]']
+        location = request.POST['location']
+        try: 
+            requests.post(SERVER_BASE_URL + 'tree/update/move', data={ \
+                'id_usr': request.user.id, 'field': {'dragged_file_id': dragged, 'dropped_file_id': dropped}})
+            return redirect('/home?location=' + location)
+        except requests.exceptions.ConnectionError:
+            return render_to_response('down.html')
+    else: 
         return HttpResponseBadRequest()

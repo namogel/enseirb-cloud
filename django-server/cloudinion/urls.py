@@ -12,4 +12,5 @@ urlpatterns = patterns('',
     url(r'^file/upload$', views.upload_file),
     url(r'^file/delete$', views.delete_file),
     url(r'^tree/new$', views.new_folder),
+    url(r'^tree/update/move$', views.move_file),
 )
