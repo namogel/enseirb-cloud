@@ -1,6 +1,5 @@
 {% extends "cloud_base.html" %}
 
-
 {% block body %}
 {{ block.super }}
 <div>
@@ -40,11 +39,13 @@
 </div>
 <div>
     <h1>Upload un fichier</h1>
-    <form action='/file/upload' method='POST' enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <input type="hidden" name="location" value="{{location}}" />
-        <input type="submit" value="Uploader ce fichier" />
-    </form>
+    <div id="upload-box">
+        <form action='/file/upload' method='POST' enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <input type="hidden" name="location" value="{{location}}" />
+            <input type="submit" value="Uploader ce fichier" />
+        </form>
+    </div>
 </div>
 {% endblock %}
