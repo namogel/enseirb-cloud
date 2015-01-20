@@ -100,6 +100,13 @@ def del_db_file(id_usr, id):
         [id_usr, id])
     db.commit()
 
+def move_db_file(id_usr, id_file, id_folder):
+    db = get_db()
+    db.execute('update files set folder = ? where id = ?', \
+        [id_folder, id_file])
+    db.commit()   
+
+
 @app.route('/search_file', methods=['POST'])
 def search_file():
     users = get_db_users()
@@ -185,6 +192,7 @@ def login_data():
         return "{}".format(user[0][0])
     return "id={}&username={}&mail={}".format(user[0][0], user[0][1], user[0][3])
 
+## Depreciated
 @app.route('/tree', methods=['GET'])
 def update_tree():
     try:
@@ -221,6 +229,21 @@ def new_folder():
         return "ok"
     except KeyError:
         return "err"
+
+@app.route('/tree/update/move', methods=['POST'])
+def move_file():
+    try:
+        id_usr = request.form['id_usr']
+        dragged_id = request.args.get('field[dragged_file_id]')
+        dropped_id = request.args.get('field[dropped_file_id]')
+
+        dragged = get_db_files(id_usr, id=dragged_id)[0]
+        move_db_file(id_usr, dragged_id, dropped_id)
+        return "ok"
+    except KeyError:
+        abort(404)
+    return "err"
+
     
 @app.route('/file/upload', methods=['POST'])
 def upload_file():

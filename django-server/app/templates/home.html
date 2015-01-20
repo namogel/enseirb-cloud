@@ -5,7 +5,7 @@
 {{ block.super }}
 <div>
     <h1>Liste des fichiers</h1>
-    <table id="table">
+    <table id="table" location="{{ location }}">
         {% if parent != '-1' %}
         <tr>
             <td><a href="http://localhost:8000/home?location={{parent}}">
@@ -13,7 +13,7 @@
         </tr>
         {% endif %}
         {% for file in files %}
-        <tr draggable="true" "id"={{file.id}}>
+        <tr draggable="true" id={{file.id}}>
         {% if file.ftype == "folder" %}
             <td><a href="http://localhost:8000/home?location={{file.id}}">
                 {{ file.name }}</a></td>
