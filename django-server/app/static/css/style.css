@@ -18,3 +18,24 @@
     background-color:white;
     list-style-type:none;
 }
+
+table tr td:first-child {
+    min-width: 75px;
+    height:30px;
+}
+
+table tr td a {
+    display:block;
+    height:100%;
+    width:100%;
+    color: black;
+}
+
+table tr td a:hover {
+    text-decoration: none;
+    color: black;
+}
+
+.folder {
+    background-color: #666699;
+}

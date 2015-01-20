@@ -44,12 +44,6 @@ def close_db(error):
 ################################################################################
 
 
-PROTOCOL = {
-    'login': ['connect', 'create', 'update', 'delete'],
-    'data': ['read', 'upload', 'download', 'update', 'delete'],
-    }
-
-
 #------------------------------------------------------------------------------#
 def add_db_user(username, password, mail):
     db = get_db()
@@ -192,30 +186,6 @@ def login_data():
         return "{}".format(user[0][0])
     return "id={}&username={}&mail={}".format(user[0][0], user[0][1], user[0][3])
 
-## Depreciated
-@app.route('/tree', methods=['GET'])
-def update_tree():
-    try:
-        mode = request.args['mode']
-        dragged_id = request.args.get('field[dragged_file_id]')
-        dropped_id = request.args.get('field[dropped_file_id]')
-        # print field
-        if mode == 'in':
-            # DEBUG 
-            print 'Putting '+dragged_id+' inside folder ' +dropped_id  
-            print "tree updated"
-            return "ok"
-        elif mode == 'swap':
-            # DEBUG 
-            print 'Swapping '+dragged_id+' and ' +dropped_id  
-            print "tree updated"
-            return "ok"
-        else:
-            raise KeyError
-    except KeyError:
-        abort(404)
-    return "err"
-
 @app.route('/tree/update/new', methods=['POST'])
 def new_folder():
     try:
@@ -234,16 +204,19 @@ def new_folder():
 def move_file():
     try:
         id_usr = request.form['id_usr']
-        dragged_id = request.args.get('field[dragged_file_id]')
-        dropped_id = request.args.get('field[dropped_file_id]')
+        dragged_id = request.form['dragged']
+        dropped_id = request.form['dropped']
 
-        dragged = get_db_files(id_usr, id=dragged_id)[0]
+        dragged = get_db_files(id_usr, id=dragged_id)
+        dropped = get_db_files(id_usr, id=dropped_id)
+        if (not dragged) or (not dropped and not dropped_id) or \
+        (dropped and dropped[0][3] != "folder"):
+            return "err"
         move_db_file(id_usr, dragged_id, dropped_id)
         return "ok"
     except KeyError:
         abort(404)
     return "err"
-
     
 @app.route('/file/upload', methods=['POST'])
 def upload_file():
@@ -273,6 +246,16 @@ def remove_file():
         return "err"
     return "ok"
 
+def fcmp (a, b):
+    if a[3] == b[3] == "folder":
+        return a[2] <= b[2]
+    else:
+        if a[3] == "folder":
+            return 1
+        if b[3] == "folder":
+            return -1
+        return a[2] <= b[2]
+
 @app.route('/tree/show', methods=['GET'])
 def show_tree():
     try:
@@ -281,6 +264,7 @@ def show_tree():
         parent = get_db_files(id_usr, id=location)[0][4] if location != '0' else -1
         files = get_db_files(id_usr, folder=location)
         ids, names, types = "", "", ""
+        files.sort(cmp=fcmp, reverse=True)
         for file in files:
             ids += str(file[0]) + ","
             names += file[2] + ","

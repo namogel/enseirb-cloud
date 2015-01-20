@@ -171,14 +171,13 @@ def new_folder(request):
 @login_required
 def move_file(request):
     if request.method == 'POST':
-        dragged = request.POST['field[dragged_file_id]']
-        dropped = request.POST['field[dropped_file_id]']
-        location = request.POST['location']
-        try: 
-            requests.post(SERVER_BASE_URL + 'tree/update/move', data={ \
-                'id_usr': request.user.id, 'field': {'dragged_file_id': dragged, 'dropped_file_id': dropped}})
-            return redirect('/home?location=' + location)
-        except requests.exceptions.ConnectionError:
-            return render_to_response('down.html')
-    else: 
-        return HttpResponseBadRequest()
+        try:
+            data = {
+                'id_usr': request.user.id,
+                'dragged': request.POST['dragged_file_id'],
+                'dropped': request.POST['dropped_file_id'],
+                }
+            requests.post(SERVER_BASE_URL + 'tree/update/move', data=data)
+            return HttpResponse()
+        except KeyError:
+            return HttpResponseBadRequest()

@@ -49,21 +49,16 @@ $(document).ready(function() {
                 
                 var data_get = {
                     'location': $('#table').attr('location'),
-                    'field': {
-                        'dragged_file_id' : e.dataTransfer.getData('id'),
-                        // DEBUG
-                        'dropped_file_id' : $(this).attr('id'),
-                        //'dropped_file_id' : '666',
-                    },
+                    'dragged_file_id' : e.dataTransfer.getData('id'),
+                    'dropped_file_id' : $(this).attr('id'),
                 }
                 $.post(DJANGO_SERV + "tree/update/move" , data_get);
-                console.log(data_get);
-
             }
             // on remet la taille par défaut
             $(this).animate({
                 width: '75px'
             }, 'fast');
+            location.reload();
         },
         
         // fin du drag (même sans drop)

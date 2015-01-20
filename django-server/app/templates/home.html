@@ -1,20 +1,25 @@
 {% extends "cloud_base.html" %}
 
+{% block head %}
+{{ block.super }}
+<script type="text/javascript" src="/static/js/dragndrop.js"></script>
+{% endblock %}
+
 {% block body %}
 {{ block.super }}
 <div>
     <h1>Liste des fichiers</h1>
     <table id="table" location="{{ location }}">
         {% if parent != '-1' %}
-        <tr>
-            <td><a href="http://localhost:8000/home?location={{parent}}">
+        <tr id="{{ parent }}">
+            <td class="folder"><a href="http://localhost:8000/home?location={{parent}}">
                 ../ </a></td>
         </tr>
         {% endif %}
         {% for file in files %}
-        <tr draggable="true" id={{file.id}}>
+        <tr draggable="true" id="{{file.id}}">
         {% if file.ftype == "folder" %}
-            <td><a href="http://localhost:8000/home?location={{file.id}}">
+            <td class="folder"><a href="http://localhost:8000/home?location={{file.id}}">
                 {{ file.name }}</a></td>
         {% else %}
             <td>{{ file.name }}</td>
@@ -30,6 +35,7 @@
         </tr>
         {% endfor %}
     </table>
+    <br/>
     <form action='/tree/new' method="POST">
         {% csrf_token %}
         <input type="text", name="name"/>
